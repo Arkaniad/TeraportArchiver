@@ -10,7 +10,7 @@ require "RMagick"
 $EPOCH = Date.new(2000,6,12) # This is the day the comic started!
 # This works because, apparently, Howard Tayler never missed a single day.
 $DATE_FORMAT = "%Y%m%d"
-$PANEL_SUFFIXES = ["nyf", "a", "b", "c", "d", "-a", "-b", "-c", "-d"] # Should work, I suppose.
+$PANEL_SUFFIXES = ["a", "b", "c", "d","nyf", "-physician", "-a", "-b", "-c", "-d"] # Should work, I suppose.
 $FILETYPES = [".png", ".jpg", ".jpeg"]
 $BASE_HOST = "static.schlockmercenary.com" # This is where all the comics are at.
 $BASE_DIR = "/comics/"
@@ -48,11 +48,19 @@ def get_multipanel_comic(date)
       if(resp.code=="200")
         $LOG.debug("Got panel #{sfx}")
         list.push(Magick::Image.from_blob(resp.body){self.format = "PNG"}.first)
+      elsif(resp.code=="404")
+        resp = http.get("#{$BASE_DIR}schlock#{date}#{sfx}#{$FILETYPES[1]}")
+        if(resp.code=="200")
+          $LOG.debug("Got panel #{sfx}")
+          list.push(Magick::Image.from_blob(resp.body){self.format = "JPG"}.first)
+        end
       end
     end
   end
   $LOG.debug("Stitching multiple panels together.")
-  write_img(date, list.append(true).to_blob)
+  i = list.append(true)
+  i.format = "PNG"
+  write_img(date, i.to_blob)
 end
 
 def write_img(date, content, fmt=".png")

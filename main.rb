@@ -10,7 +10,7 @@ require "RMagick"
 $EPOCH = Date.new(2000,6,12) # This is the day the comic started!
 # This works because, apparently, Howard Tayler never missed a single day.
 $DATE_FORMAT = "%Y%m%d"
-$PANEL_SUFFIXES = ["a", "b", "c", "d", "-a", "-b", "-c", "-d"] # Should work, I suppose.
+$PANEL_SUFFIXES = ["nyf", "a", "b", "c", "d", "-a", "-b", "-c", "-d"] # Should work, I suppose.
 $BASE_HOST = "static.schlockmercenary.com" # This is where all the comics are at.
 $BASE_DIR = "/comics/"
 $STORE_DIR = "#{Dir.getwd}/comics/"
@@ -71,7 +71,8 @@ end
 
 $LOG.info("Starting at #{$EPOCH.to_s} and fetching from #{$BASE_HOST}")
 
-while 1 do
+# Get all comics from the comic's epoch to now!
+(Date.today - $EPOCH).to_i.times do
   get_comic($EPOCH.strftime("%Y%m%d"))
   $EPOCH=$EPOCH.next  
 end

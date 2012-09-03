@@ -4,13 +4,13 @@
 require "net/http"
 require "logger"
 require "date"
-
+require "RMagick"
 
 # Set some globals. Rubyists cringe here!
 $EPOCH = Date.new(2000,6,12) # This is the day the comic started!
 # This works because, apparently, Howard Tayler never missed a single day.
 $DATE_FORMAT = "%Y%m%d"
-$PANEL_SUFFIXES = ["a", "b" "c", "d", "-a", "-b", "-c", "-d"] # Should work, I suppose.
+$PANEL_SUFFIXES = ["a", "b", "c", "d", "-a", "-b", "-c", "-d"] # Should work, I suppose.
 $BASE_HOST = "static.schlockmercenary.com" # This is where all the comics are at.
 $BASE_DIR = "/comics/"
 $STORE_DIR = "#{Dir.getwd}/comics/"
@@ -22,11 +22,36 @@ def get_comic(date)
   $LOG.debug("GET: http://static.schlockmercenary.com/comics/schlock#{date}.png")
   Net::HTTP.start($BASE_HOST) do |http|
     resp = http.get( "#{$BASE_DIR}schlock#{date}.png" )
-    open("#{$STORE_DIR}#{date}.png", "a+") do |file|
-      file.write(resp.body)
+    if(resp.code=="404")
+      $LOG.debug("Multipanel comic!")
+      get_multipanel_comic(date)
+    else
+      write_img(date, resp.body)
     end
   end
   $LOG.debug("File lies at #{$STORE_DIR}#{date}.png")
+end
+
+def get_multipanel_comic(date)
+  $LOG.debug("Getting multi-panel comic for this date.")
+  list = Magick::ImageList.new
+  Net::HTTP.start($BASE_HOST) do |http|
+    $PANEL_SUFFIXES.each do |sfx|
+      resp = http.get("#{$BASE_DIR}schlock#{date}#{sfx}.png")
+      if(resp.code=="200")
+        $LOG.debug("Got panel #{sfx}")
+        list.push(Magick::Image.from_blob(resp.body){self.format = "PNG"}.first)
+      end
+    end
+  end
+  $LOG.debug("Stitching multiple panels together.")
+  write_img(date, list.append(true).to_blob)
+end
+
+def write_img(date, content, dir=$STORE_DIR)
+  open("#{dir}#{date}.png", "a+") do |file|
+    file.write(content)
+  end
 end
 
 # Format the logger nicely.

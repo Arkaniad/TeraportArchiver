@@ -23,7 +23,7 @@ To use, just run main.rb. It will ask you for a directory to put the comics in, 
 Potential Addins
 ----------------
 
-Resuming from the most recent comic cloned
-Compression
-Progress / Speed calculations
-Clone only certain books / divide comics into the books
+* Resuming from the most recent comic cloned
+* Compression
+* Progress / Speed calculations
+* Clone only certain books / divide comics into the books

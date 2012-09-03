@@ -9,6 +9,11 @@ By creating, modifying and using this piece of software, you and I agree
 not to reproduce the webcomic in any way shape or form for profit. I 
 created this program purely as a personal mirror for long roadtrips.
 
+Requirements
+------------
+
+* RMagick
+* Ruby (Any version works, really.)
 
 Use
 ---

@@ -11,6 +11,7 @@ $EPOCH = Date.new(2000,6,12) # This is the day the comic started!
 # This works because, apparently, Howard Tayler never missed a single day.
 $DATE_FORMAT = "%Y%m%d"
 $PANEL_SUFFIXES = ["nyf", "a", "b", "c", "d", "-a", "-b", "-c", "-d"] # Should work, I suppose.
+$FILETYPES = [".png", ".jpg", ".jpeg"]
 $BASE_HOST = "static.schlockmercenary.com" # This is where all the comics are at.
 $BASE_DIR = "/comics/"
 $STORE_DIR = "#{Dir.getwd}/comics/"
@@ -21,15 +22,21 @@ $LOG = Logger.new(STDOUT)
 def get_comic(date)
   $LOG.debug("GET: http://static.schlockmercenary.com/comics/schlock#{date}.png")
   Net::HTTP.start($BASE_HOST) do |http|
-    resp = http.get( "#{$BASE_DIR}schlock#{date}.png" )
+    resp = http.get( "#{$BASE_DIR}schlock#{date}#{$FILETYPES[0]}" )
     if(resp.code=="404")
-      $LOG.debug("Multipanel comic!")
-      get_multipanel_comic(date)
+      resp = http.get( "#{$BASE_DIR}schlock#{date}#{$FILETYPES[1]}" )
+      if(resp.code=="404")
+        $LOG.debug("Multipanel comic!")
+        get_multipanel_comic(date)
+      else
+        write_img(date, resp.body, $FILETYPES[1])
+        $LOG.debug("File lies at #{$STORE_DIR}#{date}.jpg")
+      end
     else
       write_img(date, resp.body)
+      $LOG.debug("File lies at #{$STORE_DIR}#{date}.png")
     end
   end
-  $LOG.debug("File lies at #{$STORE_DIR}#{date}.png")
 end
 
 def get_multipanel_comic(date)
@@ -48,8 +55,8 @@ def get_multipanel_comic(date)
   write_img(date, list.append(true).to_blob)
 end
 
-def write_img(date, content, dir=$STORE_DIR)
-  open("#{dir}#{date}.png", "a+") do |file|
+def write_img(date, content, fmt=".png")
+  open("#{$STORE_DIR}#{date}#{fmt}", "a+") do |file|
     file.write(content)
   end
 end
@@ -63,7 +70,9 @@ end
 
 $LOG.info("Checking storage directory and creating it if it doesn't exist...")
 if File.exist?($STORE_DIR)
-  $LOG.info("Directory already exists, wonderful. Continuing as planned.")
+  $LOG.info("Directory already exists, wonderful. Resuming")
+  resumedate = Dir.glob("#{$STORE_DIR}*").map!{|ent| Date.parse(File.basename(ent).chomp(".png"))}.sort!.last.strftime("%Y%m%d")
+  $EPOCH = Date.parse(resumedate)
 else
   Dir.mkdir($STORE_DIR)
   $LOG.info("Created the directory!")

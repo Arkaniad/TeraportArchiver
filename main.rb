@@ -79,7 +79,7 @@ end
 $LOG.info("Checking storage directory and creating it if it doesn't exist...")
 if File.exist?($STORE_DIR)
   $LOG.info("Directory already exists, wonderful. Resuming")
-  resumedate = Dir.glob("#{$STORE_DIR}*").map!{|ent| Date.parse(File.basename(ent).chomp(".png"))}.sort!.last.strftime("%Y%m%d")
+  resumedate = Dir.glob("#{$STORE_DIR}*.png").map!{|ent| Date.parse(File.basename(ent).chomp(".png"))}.sort!.last.strftime("%Y%m%d")
   $EPOCH = Date.parse(resumedate)
 else
   Dir.mkdir($STORE_DIR)

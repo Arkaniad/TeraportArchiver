@@ -10,7 +10,7 @@ require "RMagick"
 $EPOCH = Date.new(2000,6,12) # This is the day the comic started!
 # This works because, apparently, Howard Tayler never missed a single day.
 $DATE_FORMAT = "%Y%m%d"
-$PANEL_SUFFIXES = ["a", "b", "c", "d","nyf", "-physician", "-a", "-b", "-c", "-d"] # Should work, I suppose.
+$PANEL_SUFFIXES = ["a", "b", "c", "d","nyf", "-physician", "-stimmie", "-RTB", "-treebranch", "a-dmatter", "b-dmatter", "c-dmatter", "-probable", "-shootback", "-diplomacy", "-planawar", "-itch", "a-inmates", "b-inmates", "c-inmates", "-a", "-b", "-c", "-d"] # Should work, I suppose.
 $FILETYPES = [".png", ".jpg", ".jpeg"]
 $BASE_HOST = "static.schlockmercenary.com" # This is where all the comics are at.
 $BASE_DIR = "/comics/"

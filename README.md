@@ -20,10 +20,18 @@ Use
 
 To use, just run main.rb. It will ask you for a directory to put the comics in, defaulting to a subdir (comic) in this directory.
 
+If you stop along the way, the downloader should resume where it left off.
+
+Caveats
+-------
+
+Only gets up to 2003 - 12 - 07 's  comic. Why?
+Howard Tayler decided to get obsessed with suffixes, that's why.
+Looking into it, though.
+
 Potential Addins
 ----------------
 
-* Resuming from the most recent comic cloned
 * Compression
 * Progress / Speed calculations
 * Clone only certain books / divide comics into the books
